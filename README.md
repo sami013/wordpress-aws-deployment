@@ -1,84 +1,24 @@
 # WordPress Deployment on AWS EC2 🚀
 
-## Project Overview
+## Overview
 
-This project demonstrates the **manual deployment of a production WordPress website** on an **AWS EC2 Ubuntu instance** using the **LAMP stack (Linux, Apache, MySQL, PHP)**.
+This project demonstrates the deployment of a **WordPress website** on an **AWS EC2 Ubuntu instance** using the **LAMP stack (Linux, Apache, MySQL, PHP)**.
 
-Instead of using one-click installers or managed hosting, the entire deployment was performed manually to understand every layer involved in hosting a WordPress application.
-
-The project focuses on Linux administration, cloud infrastructure, web server configuration, database management, WordPress migration, troubleshooting, and deployment automation.
+The objective of this project was to gain hands-on experience with cloud infrastructure, Linux server administration, web server configuration, database setup, WordPress deployment, and Bash scripting.
 
 ---
 
-# Objectives
-
-* Deploy a WordPress website on AWS EC2
-* Learn Linux server administration
-* Configure Apache, PHP and MySQL
-* Automate server setup using Bash
-* Practice Git & GitHub workflow
-* Understand WordPress migration
-* Troubleshoot real deployment issues
-
----
-
-# Tech Stack
-
-### Cloud
+# Technologies Used
 
 * AWS EC2
-
-### Operating System
-
 * Ubuntu Linux
-
-### Web Server
-
-* Apache2
-
-### Database
-
+* Apache Web Server
 * MySQL
-
-### Backend
-
 * PHP
-
-### CMS
-
 * WordPress
-
-### Scripting
-
 * Bash
-
-### Version Control
-
 * Git
 * GitHub
-
----
-
-# Architecture
-
-```text
-                 User
-                   │
-                   │ HTTP
-                   ▼
-        AWS EC2 Ubuntu Server
-                   │
-        ┌──────────┴──────────┐
-        │                     │
-        ▼                     ▼
-   Apache Web Server      MySQL Database
-        │
-        ▼
-       PHP
-        │
-        ▼
-    WordPress Website
-```
 
 ---
 
@@ -86,73 +26,104 @@ The project focuses on Linux administration, cloud infrastructure, web server co
 
 ```text
 wordpress-aws-deployment/
-
+│
 ├── README.md
 ├── LICENSE
 ├── .gitignore
 │
 ├── scripts/
-│   └── lamp_setup.sh
+│   ├── lamp_setup.sh
+│   ├── database_setup.sh
+│   └── wordpress_install.sh
 │
 └── docs/
-    └── screenshots/
-        ├── ec2-instance.png
-        ├── security-group.png
-        └── wordpress-running.png
+    ├── ec2-instance.png
+    ├── security-group.png
+    └── wordpress-running.png
+```
+
+---
+
+# Architecture
+
+```text
+                    User
+                      │
+                 HTTP Request
+                      │
+                      ▼
+            AWS EC2 Ubuntu Instance
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+        ▼                           ▼
+ Apache Web Server             MySQL Database
+        │
+        ▼
+       PHP
+        │
+        ▼
+ WordPress Application
 ```
 
 ---
 
 # Features
 
-* Automated LAMP stack installation using Bash
+* Automated LAMP stack installation
+* Automated MySQL database creation and user configuration
+* Automated WordPress download and installation
 * Apache web server configuration
-* MySQL database setup
-* PHP installation
-* Manual WordPress deployment
-* WordPress database migration
-* Theme migration
-* Media uploads migration
-* Plugin migration
-* Linux permission management
-* Deployment troubleshooting
+* Linux file ownership and permission management
+* WordPress deployment on AWS EC2
 
 ---
 
-# Deployment Workflow
+# Scripts
 
-### 1. Launch EC2
-
-* Launch Ubuntu EC2 instance
-* Configure Security Group
-
-Open ports:
-
-* SSH (22)
-* HTTP (80)
-* HTTPS (443)
+| Script                 | Description                                                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `lamp_setup.sh`        | Installs Apache, MySQL, PHP, and required PHP extensions.                                                         |
+| `database_setup.sh`    | Creates the WordPress database, database user, and grants privileges.                                             |
+| `wordpress_install.sh` | Downloads the latest WordPress release, copies files to the web server, and configures ownership and permissions. |
 
 ---
 
-### 2. Connect to EC2
+# Deployment Steps
+
+## 1. Launch an EC2 Instance
+
+Create an Ubuntu EC2 instance on AWS.
+
+Configure the Security Group to allow:
+
+| Port | Service |
+| ---- | ------- |
+| 22   | SSH     |
+| 80   | HTTP    |
+| 443  | HTTPS   |
+
+---
+
+## 2. Connect to the EC2 Instance
 
 ```bash
-ssh -i key.pem ubuntu@<EC2-PUBLIC-IP>
+ssh -i your-key.pem ubuntu@<EC2-PUBLIC-IP>
 ```
 
 ---
 
-### 3. Clone Repository
+## 3. Clone the Repository
 
 ```bash
-git clone https://github.com/<username>/wordpress-aws-deployment.git
+git clone https://github.com/<your-github-username>/wordpress-aws-deployment.git
 
 cd wordpress-aws-deployment
 ```
 
 ---
 
-### 4. Install LAMP
+## 4. Install the LAMP Stack
 
 ```bash
 chmod +x scripts/lamp_setup.sh
@@ -160,255 +131,124 @@ chmod +x scripts/lamp_setup.sh
 sudo ./scripts/lamp_setup.sh
 ```
 
-The script installs:
-
-* Apache
-* PHP
-* MySQL
-
-and configures the server.
-
 ---
 
-### 5. Download WordPress
-
-Download and extract the latest WordPress release.
-
-Copy files into:
-
-```text
-/var/www/html
-```
-
-Configure ownership and permissions.
-
----
-
-### 6. Configure Database
-
-* Create MySQL database
-* Create database user
-* Grant privileges
-* Import production SQL backup
-
----
-
-### 7. Configure WordPress
-
-Update:
-
-```text
-wp-config.php
-```
-
-with
-
-* Database Name
-* Username
-* Password
-* Host
-
----
-
-### 8. Migrate Website
-
-Copy:
-
-* Custom Theme
-* Uploads
-* Plugins
-
-Import:
-
-* SQL Database
-
-Update:
-
-* siteurl
-* home
-
-Restart Apache.
-
----
-
-# Challenges & Troubleshooting
-
-During deployment several real-world issues were encountered and resolved.
-
-## MySQL Failed to Start
-
-**Issue**
-
-MySQL failed to start because the EC2 instance ran out of memory.
-
-**Cause**
-
-The Ubuntu micro instance did not have enough RAM and the Linux OOM Killer terminated MySQL during startup.
-
-**Resolution**
-
-* Created a 2 GB swap file
-* Enabled swap
-* Configured automatic swap on reboot
-* Restarted MySQL successfully
-
----
-
-## GitHub SSH Authentication
-
-**Issue**
-
-Git push and clone failed with:
-
-```text
-Permission denied (publickey)
-```
-
-**Resolution**
-
-* Generated SSH key
-* Added public key to GitHub
-* Verified authentication using
+## 5. Configure the Database
 
 ```bash
-ssh -T git@github.com
+chmod +x scripts/database_setup.sh
+
+sudo ./scripts/database_setup.sh
 ```
 
 ---
 
-## Theme Not Detected
+## 6. Install WordPress
 
-**Issue**
+```bash
+chmod +x scripts/wordpress_install.sh
 
-WordPress did not recognize the custom theme.
+sudo ./scripts/wordpress_install.sh
+```
 
-**Cause**
+---
 
-The repository contained an additional parent directory.
+## 7. Complete the WordPress Installation
 
-**Resolution**
-
-Moved the actual theme folder into:
+Open your browser and navigate to:
 
 ```text
-wp-content/themes/
+http://<EC2-PUBLIC-IP>
+```
+
+Complete the WordPress setup wizard by providing:
+
+* Site Title
+* Username
+* Password
+* Email Address
+
+---
+
+# Verification
+
+Verify that the required services are running.
+
+### Apache
+
+```bash
+sudo systemctl status apache2
+```
+
+### MySQL
+
+```bash
+sudo systemctl status mysql
+```
+
+### PHP
+
+```bash
+php -v
 ```
 
 ---
 
-## WordPress Critical Error
+# Screenshots
 
-**Issue**
+The repository includes screenshots demonstrating the deployment process.
 
-```text
-Call to undefined function get_field()
-```
+* EC2 Instance
+* AWS Security Group Configuration
+* Running WordPress Website
 
-**Cause**
-
-The Advanced Custom Fields plugin had not been migrated.
-
-**Resolution**
-
-Copied the complete plugins directory from the production server.
+These images are available in the `docs/` directory.
 
 ---
 
-## Site Redirect Issues
+# Challenges Encountered
 
-**Issue**
+During deployment, several common issues were encountered and resolved.
 
-Website redirected to the production domain.
+* File permission errors while copying WordPress files
+* Apache ownership and permission configuration
+* WordPress permalink issues after migration
+* WPBakery (`js_composer`) compatibility notice on newer WordPress versions
 
-**Resolution**
-
-Updated:
-
-* siteurl
-* home
-
-inside the WordPress database.
+Resolving these issues provided practical experience in Linux system administration and WordPress troubleshooting.
 
 ---
 
 # Skills Demonstrated
 
 * AWS EC2 provisioning
-* Linux administration
+* Linux command-line administration
+* Apache web server configuration
+* MySQL database management
+* PHP installation and configuration
 * Bash scripting
-* Apache configuration
-* PHP configuration
-* MySQL administration
-* WordPress migration
-* Git & GitHub workflow
-* SSH authentication
-* File permission management
-* Debugging PHP errors
-* Database migration
-* Troubleshooting production deployments
-
----
-
-# Screenshots
-
-Deployment screenshots are available in:
-
-```text
-docs/screenshots/
-```
-
-Examples include:
-
-* EC2 Instance
-* Security Group Configuration
-* Running WordPress Website
+* WordPress deployment
+* Linux file ownership and permissions
+* Git and GitHub version control
+* Troubleshooting deployment issues
 
 ---
 
 # Future Improvements
 
-Potential improvements include:
+Potential enhancements for this project include:
 
-* HTTPS using Let's Encrypt
-* Docker containerization
-* Docker Compose
-* Nginx reverse proxy
-* Amazon RDS
-* S3 media storage
-* GitHub Actions CI/CD
-* Terraform infrastructure automation
-* Route53 custom domain
-* CloudFront CDN
-* Automated backups
-* CloudWatch monitoring
-
----
-
-# Key Learnings
-
-Through this project I gained practical experience with:
-
-* Deploying applications on AWS
-* Linux server management
-* Automating repetitive tasks using Bash
-* Understanding WordPress architecture
-* Managing Apache, PHP and MySQL
-* Migrating production websites
-* Diagnosing infrastructure issues
-* Debugging WordPress and PHP errors
-* Working with Git and GitHub in deployment workflows
+* Configure HTTPS using Let's Encrypt SSL
+* Deploy a custom domain
+* Automate WordPress configuration
+* Add backup and restore automation
+* Use Amazon RDS instead of a local MySQL server
+* Provision infrastructure using Terraform
+* Configure a CI/CD pipeline for automated deployments
 
 ---
 
 # License
 
-This project is licensed under the MIT License.
-
----
-
-**Author**
-
-**Sami Ur Rehman**
-
-AWS • Linux • Git • Bash • WordPress • PHP • DevOps
+This project is licensed under the MIT License. See the `LICENSE` file for more information.
 
