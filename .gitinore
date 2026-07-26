@@ -1,0 +1,22 @@
+# WordPress sensitive files
+wp-config.php
+
+# Database backups
+*.sql
+
+# AWS credentials
+*.pem
+*.key
+
+# Environment files
+.env
+
+# Logs
+*.log
+
+# WordPress uploads (optional)
+wp-content/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
